@@ -1,57 +1,180 @@
-<script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzxJB0j14Mu3l-dGFUyVy9nA30O427gxf8R4n-Ul1AUUl-65Qpi4_HzLlDKvl18vLLrBg/exec"; // paste the web app URL
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_blank">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diwali Expense Tracker</title>
+    <style>
+      :root {
+        --primary: #f59e0b;
+        --primary-hover: #d97706;
+        --bg-dark: #0f172a;
+        --card-bg: rgba(255, 255, 255, 0.92);
+        --text: #1f2937;
+      }
+      * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+      body {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #31103f 100%);
+        color: var(--text);
+        margin: 0;
+        padding: 16px 12px;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        overflow-x: hidden;
+      }
+      .bg-glow {
+        position: absolute;
+        top: -50px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, rgba(0,0,0,0) 70%);
+        z-index: 0;
+        pointer-events: none;
+      }
+      .container {
+        width: 100%;
+        max-width: 480px;
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        position: relative;
+        z-index: 10;
+        border: 1px solid rgba(251, 191, 36, 0.3);
+      }
+      .header-art { text-align: center; margin-bottom: 12px; }
+      .diya-icon { font-size: 2.2rem; margin-bottom: -4px; display: inline-block; animation: flicker 2s infinite alternate; }
+      @keyframes flicker { 0% { transform: scale(1); opacity: 0.9; filter: drop-shadow(0 0 2px #f59e0b); } 100% { transform: scale(1.08); opacity: 1; filter: drop-shadow(0 0 8px #fbbf24); } }
+      h2 { margin: 0 0 4px 0; color: #78350f; text-align: center; font-size: 1.6rem; }
+      .event-date { text-align: center; font-size: 0.85rem; color: #92400e; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+      .quote-box { background: #fef3c7; border-left: 4px solid #d97706; padding: 10px 12px; border-radius: 0 8px 8px 0; font-size: 0.85rem; font-style: italic; color: #78350f; margin-bottom: 18px; text-align: center; }
+      .form-group { margin-bottom: 16px; }
+      label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85rem; color: #4b5563; }
+      input, select { width: 100%; padding: 11px 14px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 1rem; outline: none; background: #fff; }
+      input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2); }
+      .amount-wrapper { display: flex; gap: 8px; }
+      .amount-wrapper input { flex: 2; }
+      .amount-wrapper select { flex: 1; }
+      button { width: 100%; padding: 13px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3); transition: transform 0.1s, opacity 0.2s; }
+      button:active { transform: scale(0.98); }
+      button:disabled { background: #9ca3af; box-shadow: none; }
+      .success-box { display: none; background-color: #ecfdf5; border: 1px solid #6ee7b7; border-radius: 12px; padding: 18px; text-align: center; margin-top: 10px; }
+      .success-box p { color: #065f46; margin: 0 0 14px 0; font-weight: 600; }
+      .btn-secondary { display: inline-block; text-decoration: none; background-color: #059669; color: white; padding: 11px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 4px 10px rgba(5, 150, 105, 0.2); }
+      .btn-add-more { background-color: transparent; color: #059669; border: 1px solid #059669; margin-top: 10px; padding: 9px 16px; box-shadow: none; }
+      .divine-footer { text-align: center; margin-top: 16px; font-size: 0.78rem; color: #6b7280; border-top: 1px dashed #e5e7eb; padding-top: 10px; }
+    </style>
+  </head>
+  <body>
+    <div class="bg-glow"></div>
+    <div class="container">
+      <div class="header-art">
+        <span class="diya-icon">🪔</span>
+        <h2>Diwali Celebration Tracker</h2>
+        <div class="event-date">✨ November 7, 2026 ✨</div>
+      </div>
+      <div class="quote-box" id="quoteDisplay">
+        "May the divine light of Diwali spread into your life peace, prosperity, happiness and good health."
+      </div>
+      <form id="expenseForm">
+        <div class="form-group">
+          <label for="personName">Your Name</label>
+          <input type="text" id="personName" name="personName" placeholder="e.g. Bhanu" required>
+        </div>
+        <div class="form-group">
+          <label for="expenseType">Expense Description</label>
+          <input type="text" id="expenseType" name="expenseType" placeholder="e.g. Fireworks, Hall, Sweets" required>
+        </div>
+        <div class="form-group">
+          <label for="amount">Amount & Currency</label>
+          <div class="amount-wrapper">
+            <input type="number" id="amount" name="amount" step="0.01" min="0.01" placeholder="0.00" required>
+            <select id="currency" name="currency">
+              <option value="CHF">CHF</option>
+              <option value="EUR">EUR</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" id="submitBtn">Submit Expense</button>
+      </form>
+      <div id="successBox" class="success-box">
+        <p>🎉 Expense recorded successfully!</p>
+        <a id="sheetLink" href="https://docs.google.com/spreadsheets/d/1uiulhB6XOlG8Pml0-p2wp_NWjHKvfZWTcG1rSbWQzkA/edit" target="_blank" class="btn-secondary">📊 View Existing Expenses in Sheet</a>
+        <br>
+        <button type="button" class="btn-add-more" onclick="resetForm()">+ Add Another Expense</button>
+      </div>
+      <div class="divine-footer">🙏 Sri Rama, Seetha, Lakshmana & Hanuma Samethaaya Namaha 🙏</div>
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzxJB0j14Mu3l-dGFUyVy9nA30O427gxf8R4n-Ul1AUUl-65Qpi4_HzLlDKvl18vLLrBg/exec";
+        const quotes = [
+          "May the divine light of Diwali spread into your life peace, prosperity, happiness and good health.",
+          "Rejoice on this blessed occasion as Lord Rama returns home, filling our hearts with boundless devotion and joy.",
+          "Let each diya you light bring a new ray of hope, unity, and abundance to our community celebration."
+        ];
 
-  // rotate quote (keep your existing quotes if desired)
-  const quotes = [
-    "\"May the divine light of Diwali spread into your life peace, prosperity, happiness and good health.\"",
-    "\"Rejoice on this blessed occasion as Lord Rama returns home, filling our hearts with boundless devotion and joy.\"",
-    "\"Let each diya you light bring a new ray of hope, unity, and abundance to our community celebration.\""
-  ];
-  document.getElementById('quoteDisplay').innerText = quotes[Math.floor(Math.random() * quotes.length)];
+        const qEl = document.getElementById('quoteDisplay');
+        if (qEl) qEl.innerText = quotes[Math.floor(Math.random() * quotes.length)];
 
-  document.getElementById('expenseForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const submitBtn = document.getElementById('submitBtn');
-    submitBtn.disabled = true;
-    submitBtn.innerText = "Recording...";
+        const form = document.getElementById('expenseForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const successBox = document.getElementById('successBox');
+        const sheetLink = document.getElementById('sheetLink');
 
-    // Use FormData -> URLSearchParams to send application/x-www-form-urlencoded (simple request, avoids preflight)
-    const formData = new FormData(this);
-    const params = new URLSearchParams();
-    for (const pair of formData.entries()) {
-      params.append(pair[0], pair[1]);
-    }
+        if (!form || !submitBtn || !successBox) return;
 
-    // Use no-cors to avoid strict CORS/preflight issues in in-app browsers.
-    // Note: response will be opaque (we can't read it). We assume success if fetch completes.
-    fetch(SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {
-        // Do NOT set 'Content-Type' manually to application/json (that triggers preflight).
-        // When mode: 'no-cors' the browser may ignore custom headers; using URLSearchParams is safe.
-      },
-      body: params.toString()
-    })
-    .then(() => {
-      // We can't inspect the response in no-cors mode; assume success
-      submitBtn.disabled = false;
-      submitBtn.innerText = "Submit Expense";
-      document.getElementById('expenseForm').style.display = 'none';
-      document.getElementById('sheetLink').href = SCRIPT_URL.replace(/\/exec.*$/, '/edit'); // optional placeholder
-      document.getElementById('successBox').style.display = 'block';
-    })
-    .catch((err) => {
-      submitBtn.disabled = false;
-      submitBtn.innerText = "Submit Expense";
-      alert("Error saving expense. Please try again.");
-      console.error(err);
-    });
-  });
+        // Hidden fallback form that opens in a new tab when fetch is blocked
+        let fallbackForm = document.createElement('form');
+        fallbackForm.style.display = 'none';
+        fallbackForm.method = 'POST';
+        fallbackForm.action = SCRIPT_URL;
+        fallbackForm.target = '_blank';
+        document.body.appendChild(fallbackForm);
 
-  function resetForm() {
-    document.getElementById('expenseForm').reset();
-    document.getElementById('expenseForm').style.display = 'block';
-    document.getElementById('successBox').style.display = 'none';
-  }
-</script>
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          submitBtn.disabled = true;
+          submitBtn.innerText = 'Recording...';
+
+          const fd = new FormData(form);
+          const params = new URLSearchParams();
+          for (const pair of fd.entries()) params.append(pair[0], pair[1]);
+
+          fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: params.toString()
+          }).then(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Submit Expense';
+            form.style.display = 'none';
+            if (sheetLink) sheetLink.href = 'https://docs.google.com/spreadsheets/d/1uiulhB6XOlG8Pml0-p2wp_NWjHKvfZWTcG1rSbWQzkA/edit';
+            if (successBox) successBox.style.display = 'block';
+          }).catch((err) => {
+            // fallback: populate and submit hidden form (opens new tab)
+            while (fallbackForm.firstChild) fallbackForm.removeChild(fallbackForm.firstChild);
+            for (const [k, v] of fd.entries()) {
+              const inp = document.createElement('input'); inp.type = 'hidden'; inp.name = k; inp.value = v; fallbackForm.appendChild(inp);
+            }
+            try { fallbackForm.submit(); } catch (e) { console.error('fallback submit failed', e); }
+
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Submit Expense';
+            alert('If submission inside the in-app browser failed, we opened an external browser tab to complete it.');
+            form.style.display = 'none';
+            if (successBox) successBox.style.display = 'block';
+          });
+        });
+
+        window.resetForm = function () { form.reset(); form.style.display = 'block'; if (successBox) successBox.style.display = 'none'; };
+      });
+    </script>
+  </body>
+</html>
