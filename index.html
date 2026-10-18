@@ -1,119 +1,223 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <base target="_blank">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Diwali Expense Tracker</title>
     <style>
-      :root { --primary:#f59e0b; --card-bg:rgba(255,255,255,0.92); --text:#1f2937; }
-      *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
-      body{background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#31103f 100%);color:var(--text);margin:0;padding:16px;min-height:100vh;display:flex;justify-content:center;align-items:center;}
-      .container{width:100%;max-width:480px;background:var(--card-bg);border-radius:20px;padding:24px;box-shadow:0 20px 40px rgba(0,0,0,0.4);border:1px solid rgba(251,191,36,0.3)}
-      h2{margin:0 0 4px;color:#78350f;text-align:center;font-size:1.3rem}
-      .quote-box{background:#fef3c7;border-left:4px solid #d97706;padding:10px;border-radius:0 8px 8px 0;font-style:italic;text-align:center;margin-bottom:12px}
-      .form-group{margin-bottom:12px}label{display:block;margin-bottom:6px;font-weight:600;color:#4b5563}
-      input, select{width:100%;padding:10px;border:1px solid #d1d5db;border-radius:10px;background:#fff}
-      .amount-wrapper{display:flex;gap:8px}.amount-wrapper input{flex:2}.amount-wrapper select{flex:1}
-      button{width:100%;padding:12px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:0;border-radius:10px;font-weight:700;cursor:pointer}
-      .success-box{display:none;background:#ecfdf5;border:1px solid #6ee7b7;padding:14px;border-radius:10px;text-align:center;margin-top:10px}
-      .btn-secondary{display:inline-block;padding:8px 12px;background:#059669;color:#fff;border-radius:8px;text-decoration:none}
+      :root {
+        --primary: #f59e0b;
+        --primary-hover: #d97706;
+        --bg-dark: #0f172a;
+        --card-bg: rgba(255, 255, 255, 0.92);
+        --text: #1f2937;
+      }
+      * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+      body {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #31103f 100%);
+        color: var(--text);
+        margin: 0;
+        padding: 16px 12px;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        overflow-x: hidden;
+      }
+      .bg-glow {
+        position: absolute;
+        top: -50px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, rgba(0,0,0,0) 70%);
+        z-index: 0;
+        pointer-events: none;
+      }
+      .container {
+        width: 100%;
+        max-width: 480px;
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        position: relative;
+        z-index: 10;
+        border: 1px solid rgba(251, 191, 36, 0.3);
+      }
+      .header-art { text-align: center; margin-bottom: 12px; }
+      .diya-icon { font-size: 2.2rem; margin-bottom: -4px; display: inline-block; animation: flicker 2s infinite alternate; }
+      @keyframes flicker { 0% { transform: scale(1); opacity: 0.9; filter: drop-shadow(0 0 2px #f59e0b); } 100% { transform: scale(1.08); opacity: 1; filter: drop-shadow(0 0 8px #fbbf24); } }
+      h2 { margin: 0 0 4px 0; color: #78350f; text-align: center; font-size: 1.6rem; }
+      .event-date { text-align: center; font-size: 0.85rem; color: #92400e; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+      .quote-box { background: #fef3c7; border-left: 4px solid #d97706; padding: 10px 12px; border-radius: 0 8px 8px 0; font-size: 0.85rem; font-style: italic; color: #78350f; margin-bottom: 18px; text-align: center; }
+      .form-group { margin-bottom: 16px; }
+      label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85rem; color: #4b5563; }
+      input, select { width: 100%; padding: 11px 14px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 1rem; outline: none; background: #fff; }
+      input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2); }
+      .amount-wrapper { display: flex; gap: 8px; }
+      .amount-wrapper input { flex: 2; }
+      .amount-wrapper select { flex: 1; }
+      button { width: 100%; padding: 13px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3); transition: transform 0.1s, opacity 0.2s; }
+      button:active { transform: scale(0.98); }
+      button:disabled { background: #9ca3af; box-shadow: none; }
+      .success-box { display: none; background-color: #ecfdf5; border: 1px solid #6ee7b7; border-radius: 12px; padding: 18px; text-align: center; margin-top: 10px; }
+      .success-box p { color: #065f46; margin: 0 0 14px 0; font-weight: 600; }
+      .btn-secondary { display: inline-block; text-decoration: none; background-color: #059669; color: white; padding: 11px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 4px 10px rgba(5, 150, 105, 0.2); }
+      .btn-add-more { background-color: transparent; color: #059669; border: 1px solid #059669; margin-top: 10px; padding: 9px 16px; box-shadow: none; }
+      .divine-footer { text-align: center; margin-top: 16px; font-size: 0.78rem; color: #6b7280; border-top: 1px dashed #e5e7eb; padding-top: 10px; }
     </style>
   </head>
   <body>
-    <div class="container">
-      <h2>Diwali Celebration Tracker</h2>
-      <div class="quote-box" id="quoteDisplay">"May the divine light of Diwali spread into your life peace, prosperity, happiness and good health."</div>
+    <div class="bg-glow"></div>
 
+    <div class="container">
+      <div class="header-art">
+        <span class="diya-icon">🪔</span>
+        <h2>Diwali Celebration Tracker</h2>
+        <div class="event-date">✨ November 7, 2026 ✨</div>
+      </div>
+
+      <div class="quote-box" id="quoteDisplay">
+        "May the divine light of Diwali spread into your life peace, prosperity, happiness and good health."
+      </div>
+      
       <form id="expenseForm">
         <div class="form-group">
           <label for="personName">Your Name</label>
-          <input id="personName" name="personName" required placeholder="e.g. Bhanu">
+          <input type="text" id="personName" name="personName" placeholder="e.g. Bhanu" required>
         </div>
 
         <div class="form-group">
           <label for="expenseType">Expense Description</label>
-          <input id="expenseType" name="expenseType" required placeholder="e.g. Fireworks, Hall, Sweets">
+          <input type="text" id="expenseType" name="expenseType" placeholder="e.g. Fireworks, Hall, Sweets" required>
         </div>
 
         <div class="form-group">
           <label for="amount">Amount & Currency</label>
           <div class="amount-wrapper">
-            <input id="amount" name="amount" type="number" step="0.01" min="0.01" required placeholder="0.00">
+            <input type="number" id="amount" name="amount" step="0.01" min="0.01" placeholder="0.00" required>
             <select id="currency" name="currency">
-              <option value="EUR">EUR</option>
               <option value="CHF">CHF</option>
+              <option value="EUR">EUR</option>
             </select>
           </div>
         </div>
 
-        <button id="submitBtn" type="submit">Submit Expense</button>
+        <button type="submit" id="submitBtn">Submit Expense</button>
       </form>
 
       <div id="successBox" class="success-box">
         <p>🎉 Expense recorded successfully!</p>
-        <a id="sheetLink" class="btn-secondary" target="_blank" href="#">View Sheet</a>
-        <div style="margin-top:8px"><button onclick="resetForm()" style="padding:8px 12px;border-radius:8px;border:1px solid #059669;background:transparent;color:#059669;cursor:pointer">+ Add Another</button></div>
+        <a id="sheetLink" href="#" target="_blank" class="btn-secondary">📊 View Existing Expenses in Sheet</a>
+        <br>
+        <button type="button" class="btn-add-more" onclick="resetForm()">+ Add Another Expense</button>
+      </div>
+
+      <div class="divine-footer">
+        🙏 Sri Rama, Seetha, Lakshmana & Hanuma Samethaaya Namaha 🙏
       </div>
     </div>
 
     <script>
-      // Replace with your Apps Script /exec URL (you already supplied this)
       const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzxJB0j14Mu3l-dGFUyVy9nA30O427gxf8R4n-Ul1AUUl-65Qpi4_HzLlDKvl18vLLrBg/exec";
       const SHEET_URL = "https://docs.google.com/spreadsheets/d/1uiulhB6XOlG8Pml0-p2wp_NWjHKvfZWTcG1rSbWQzkA/edit";
 
-      // small quote rotation
-      (function() {
+      // rotate quote
+      (function(){
         const q = [
           "May the divine light of Diwali spread into your life peace, prosperity, happiness and good health.",
           "Rejoice on this blessed occasion as Lord Rama returns home, filling our hearts with boundless devotion and joy.",
           "Let each diya you light bring a new ray of hope, unity, and abundance to our community celebration."
         ];
-        const el = document.getElementById('quoteDisplay');
-        if (el) el.innerText = q[Math.floor(Math.random()*q.length)];
+        const el = document.getElementById('quoteDisplay'); if (el) el.innerText = q[Math.floor(Math.random()*q.length)];
       })();
 
-      function resetForm(){
-        document.getElementById('expenseForm').reset();
-        document.getElementById('expenseForm').style.display = 'block';
-        document.getElementById('successBox').style.display = 'none';
+      function ensureHiddenIframe(name) {
+        let iframe = document.querySelector('iframe[name="'+name+'"]');
+        if (iframe) return iframe;
+        iframe = document.createElement('iframe');
+        iframe.name = name;
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+        return iframe;
       }
 
-      document.getElementById('expenseForm').addEventListener('submit', function(e){
+      document.getElementById('expenseForm').addEventListener('submit', function (e) {
         e.preventDefault();
+        const form = this;
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.disabled = true;
         submitBtn.innerText = 'Recording...';
 
-        // Build and submit a real HTML form so the request is a normal POST (application/x-www-form-urlencoded).
-        // This is the most reliable approach inside restrictive in-app browsers (WhatsApp).
-        const fd = new FormData(this);
-        const tempForm = document.createElement('form');
-        tempForm.method = 'POST';
-        tempForm.action = SCRIPT_URL;
-        tempForm.target = '_blank'; // open external tab if in-app browser blocks navigation
+        const iframeName = 'diwali_hidden_iframe';
+        const iframe = ensureHiddenIframe(iframeName);
 
-        for (const [k,v] of fd.entries()) {
+        let loaded = false;
+        const onLoad = function () {
+          loaded = true;
+          cleanup();
+          document.getElementById('expenseForm').style.display = 'none';
+          document.getElementById('sheetLink').href = SHEET_URL;
+          document.getElementById('successBox').style.display = 'block';
+          submitBtn.disabled = false;
+          submitBtn.innerText = 'Submit Expense';
+        };
+        iframe.addEventListener('load', onLoad, { once: true });
+
+        const fd = new FormData(form);
+        const temp = document.createElement('form');
+        temp.method = 'POST';
+        temp.action = SCRIPT_URL;
+        temp.target = iframeName;
+
+        for (const [k, v] of fd.entries()) {
           const inp = document.createElement('input');
           inp.type = 'hidden';
           inp.name = k;
           inp.value = v;
-          tempForm.appendChild(inp);
+          temp.appendChild(inp);
         }
-        document.body.appendChild(tempForm);
+        document.body.appendChild(temp);
+
+        const fallbackTimer = setTimeout(function () {
+          if (!loaded) {
+            try { window.open(SCRIPT_URL, '_blank'); } catch (e) { console.error('open tab fallback failed', e); }
+            cleanup();
+            alert('If submission inside this view failed, we opened an external tab to complete it.');
+            document.getElementById('expenseForm').style.display = 'none';
+            document.getElementById('sheetLink').href = SHEET_URL;
+            document.getElementById('successBox').style.display = 'block';
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Submit Expense';
+          }
+        }, 2000);
+
+        function cleanup() {
+          clearTimeout(fallbackTimer);
+          try { temp.remove(); } catch (e) {}
+        }
+
         try {
-          tempForm.submit(); // normal POST navigation (opens new tab/window)
-          // assume success (Apps Script will append). Show UI immediately.
-          document.getElementById('expenseForm').style.display = 'none';
-          document.getElementById('sheetLink').href = SHEET_URL;
-          document.getElementById('successBox').style.display = 'block';
+          temp.submit();
         } catch (err) {
-          alert('Submission failed inside the in-app browser. Try "Open in Browser" from WhatsApp or use the link opened.');
-          console.error(err);
-        } finally {
+          cleanup();
+          temp.remove();
+          try { window.open(SCRIPT_URL, '_blank'); } catch (e) {}
+          alert('Submission failed in this view; opened external tab.');
           submitBtn.disabled = false;
           submitBtn.innerText = 'Submit Expense';
-          tempForm.remove();
         }
       });
+
+      function resetForm() {
+        document.getElementById('expenseForm').reset();
+        document.getElementById('expenseForm').style.display = 'block';
+        document.getElementById('successBox').style.display = 'none';
+      }
     </script>
   </body>
 </html>
